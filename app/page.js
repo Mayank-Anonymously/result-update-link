@@ -26,6 +26,7 @@ const Home = () => {
     result: [{ time: "", number: "" }],
     next_result: "",
     key: "",
+    time: "",
   });
 
   // Handle top-level input change
@@ -132,6 +133,7 @@ const Home = () => {
       result: [{ time: "", number: "" }],
       next_result: "",
       key: "",
+      time: "",
     });
   };
 
@@ -227,6 +229,45 @@ const Home = () => {
                         />
                       </Col>
 
+                      <Col md={4} className="mt-3">
+                        <Form.Label htmlFor="time">Result Time</Form.Label>
+                        <Form.Control
+                          id="time"
+                          type="time"
+                          name="time"
+                          placeholder="Next Result"
+                          value={moment(form.time).format("HH:mm")}
+                          onChange={(e) => {
+                            const time = e.target.value;
+                            const [hour, minute] = time.split(":").map(Number);
+
+                            const totalMinutes = hour * 60 + minute;
+                            const roundedMinutes =
+                              Math.ceil(totalMinutes / 15) * 15;
+
+                            const roundedHour = Math.floor(roundedMinutes / 60);
+                            const roundedMinute = roundedMinutes % 60;
+
+                            const roundedTime = moment()
+                              .set({
+                                hour: roundedHour,
+                                minute: roundedMinute,
+                                second: 0,
+                              })
+                              .toDate();
+
+                            const timestamp = roundedTime.getTime();
+
+                            handleChange({
+                              target: {
+                                name: "time",
+                                value: timestamp,
+                              },
+                            });
+                          }}
+                          required
+                        />
+                      </Col>
                       <Col md={4}>
                         <Form.Label htmlFor="number">Number</Form.Label>
                         <Form.Control
@@ -325,11 +366,11 @@ const Home = () => {
                           <td>
                             {res.result.map((r, i) => (
                               <div key={i}>
-                                {r.time} - {r.number}
+                                {moment(r.time).format("HH:mm A")} - {r.number}
                               </div>
                             ))}
                           </td>
-                          <td>{res.next_result}</td>
+                          <td>{moment(res.next_result).format("HH:mm A")}</td>
                           <td>
                             <Button
                               variant="primary"
