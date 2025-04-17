@@ -93,6 +93,7 @@ const Home = () => {
     axios
       .request(options)
       .then(function (response) {
+        apiforResults;
         console.log(response.data);
       })
       .catch(function (error) {
@@ -117,25 +118,6 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const apiforResults = () => {
-      const options = {
-        method: "GET",
-        url: "https://ewn-bat-ball.vercel.app/api/fetch-result",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-
-      axios
-        .request(options)
-        .then(function (response) {
-          setResults(response.data.data);
-          // console.log(response.data.datqa);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
     const fetchCategores = () => {
       const options = {
         method: "GET",
@@ -155,8 +137,9 @@ const Home = () => {
           console.error(error);
         });
     };
-
-    apiforResults();
+    setInterval(() => {
+      apiforResults();
+    }, 1000);
     fetchCategores();
   }, []);
 
@@ -180,6 +163,7 @@ const Home = () => {
                   <Form onSubmit={handleAddResult}>
                     <Row className="g-3 container">
                       <Col md={4}>
+                        <Form.Label htmlFor="categoryname">Category</Form.Label>
                         <Form.Select
                           name="categoryname"
                           value={form.categoryname}
@@ -187,17 +171,16 @@ const Home = () => {
                           required
                         >
                           <option value="">Select Category</option>
-                          {getCategories.map((item, index) => {
-                            return (
-                              <option value={item.categoryname} key={index}>
-                                {item.categoryname}
-                              </option>
-                            );
-                          })}
+                          {getCategories.map((item, index) => (
+                            <option value={item.categoryname} key={index}>
+                              {item.categoryname}
+                            </option>
+                          ))}
                         </Form.Select>
                       </Col>
 
                       <Col md={4}>
+                        <Form.Label htmlFor="key">Key</Form.Label>
                         <Form.Control
                           type="text"
                           name="key"
@@ -207,7 +190,9 @@ const Home = () => {
                           required
                         />
                       </Col>
+
                       <Col md={4}>
+                        <Form.Label htmlFor="date">Date</Form.Label>
                         <Form.Control
                           type="date"
                           name="date"
@@ -217,7 +202,9 @@ const Home = () => {
                           required
                         />
                       </Col>
+
                       <Col md={4}>
+                        <Form.Label htmlFor="number">Number</Form.Label>
                         <Form.Control
                           type="number"
                           name="number"
@@ -228,38 +215,102 @@ const Home = () => {
                         />
                       </Col>
 
+                      <Col md={4} className="mt-3">
+                        <Form.Label htmlFor="next_result">
+                          Next Result
+                        </Form.Label>
+                        <Form.Control
+                          id="next_result"
+                          type="time"
+                          name="next_result"
+                          placeholder="Next Result"
+                          value={moment(form.next_result).format("HH:mm")}
+                          onChange={(e) => {
+                            const time = e.target.value;
+                            const [hour, minute] = time.split(":").map(Number);
+
+                            const totalMinutes = hour * 60 + minute;
+                            const roundedMinutes =
+                              Math.ceil(totalMinutes / 15) * 15;
+
+                            const roundedHour = Math.floor(roundedMinutes / 60);
+                            const roundedMinute = roundedMinutes % 60;
+
+                            const roundedTime = moment()
+                              .set({
+                                hour: roundedHour,
+                                minute: roundedMinute,
+                                second: 0,
+                              })
+                              .toDate();
+
+                            const timestamp = roundedTime.getTime();
+
+                            handleChange({
+                              target: {
+                                name: "next_result",
+                                value: timestamp,
+                              },
+                            });
+                          }}
+                          required
+                        />
+                      </Col>
+
                       <Col md={12}>
                         <h6 className="mt-3">Result Entries</h6>
                         {form.result.map((res, index) => (
                           <Row className="g-2 mb-2" key={index}>
                             <Col md={5}>
+                              <Form.Label htmlFor={`result-time-${index}`}>
+                                Time
+                              </Form.Label>
                               <Form.Control
+                                id={`result-time-${index}`}
                                 type="time"
                                 placeholder="Time"
                                 value={moment(res.time).format("HH:mm")}
                                 onChange={(e) => {
-                                  const time = e.target.value; // Example: "14:15"
+                                  const time = e.target.value; // "14:10"
+                                  const [hour, minute] = time
+                                    .split(":")
+                                    .map(Number);
 
-                                  const newDate = moment(
-                                    time,
-                                    "HH:mm"
-                                  ).toDate(); // JS Date
+                                  const totalMinutes = hour * 60 + minute;
+                                  const roundedMinutes =
+                                    Math.ceil(totalMinutes / 15) * 15;
+
+                                  const roundedHour = Math.floor(
+                                    roundedMinutes / 60
+                                  );
+                                  const roundedMinute = roundedMinutes % 60;
+
+                                  const roundedTime = moment()
+                                    .set({
+                                      hour: roundedHour,
+                                      minute: roundedMinute,
+                                      second: 0,
+                                    })
+                                    .toDate();
+
                                   const formattedTime =
-                                    moment(newDate).format("hh:mm A"); // "02:15 PM"
-
-                                  console.log("Formatted Time:", formattedTime); // optional
+                                    moment(roundedTime).format("hh:mm A");
 
                                   handleResultChange(
                                     index,
                                     "time",
-                                    newDate.getTime()
-                                  ); // or formattedTime, depending on what you want to store
+                                    roundedTime.getTime()
+                                  );
                                 }}
                                 required
                               />
                             </Col>
                             <Col md={5}>
+                              <Form.Label htmlFor={`result-number-${index}`}>
+                                Number
+                              </Form.Label>
                               <Form.Control
+                                id={`result-number-${index}`}
                                 type="number"
                                 placeholder="Number"
                                 value={res.number}
@@ -286,28 +337,6 @@ const Home = () => {
                         <Button variant="secondary" onClick={addResultRow}>
                           + Add Result Entry
                         </Button>
-                      </Col>
-
-                      <Col md={4} className="mt-3">
-                        <Form.Control
-                          type="time"
-                          name="next_result"
-                          placeholder="Next Result"
-                          value={moment(form.next_result).format("HH:mm")}
-                          onChange={(e) => {
-                            const time = e.target.value; // "14:30"
-                            const newDate = moment(time, "HH:mm A").toDate();
-                            const timestamp = newDate.getTime();
-
-                            handleChange({
-                              target: {
-                                name: "next_result",
-                                value: timestamp, // or moment(newDate).format("hh:mm A") if storing formatted string
-                              },
-                            });
-                          }}
-                          required
-                        />
                       </Col>
                     </Row>
 
