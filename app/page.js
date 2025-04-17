@@ -366,11 +366,16 @@ const Home = () => {
                           <td>
                             {res.result.map((r, i) => (
                               <div key={i}>
-                                {moment(r.time).format("HH:mm A")} - {r.number}
+                                {moment(parseInt(r.time)).format("HH:mm A")} -{" "}
+                                {r.number}
                               </div>
                             ))}
                           </td>
-                          <td>{moment(res.next_result).format("HH:mm A")}</td>
+                          <td>
+                            {moment(parseInt(res.next_result)).format(
+                              "HH:mm A"
+                            )}
+                          </td>
                           <td>
                             <Button
                               variant="primary"
