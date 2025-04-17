@@ -70,6 +70,25 @@ const Home = () => {
   };
 
   // Submit handler
+  const apiforResults = () => {
+    const options = {
+      method: "GET",
+      url: "https://ewn-bat-ball.vercel.app/api/fetch-result",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    axios
+      .request(options)
+      .then(function (response) {
+        setResults(response.data.data);
+        // console.log(response.data.datqa);
+      })
+      .catch(function (error) {
+        console.error(error);
+      });
+  };
   const handleAddResult = (e) => {
     e.preventDefault();
 
@@ -93,7 +112,7 @@ const Home = () => {
     axios
       .request(options)
       .then(function (response) {
-        apiforResults;
+        apiforResults();
         console.log(response.data);
       })
       .catch(function (error) {
