@@ -21,7 +21,7 @@ const Home = () => {
   const [getCategories, setCategories] = useState([]);
   const [form, setForm] = useState({
     categoryname: "",
-    date: "",
+    date: moment().format("YYYY-MM-DD"), // 👈 default today's date,
     number: "",
     result: [{ time: "", number: "" }],
     next_result: "",
@@ -197,8 +197,9 @@ const Home = () => {
                           type="date"
                           name="date"
                           placeholder="Date (YYYY-MM-DD)"
-                          value={form.date}
+                          value={form.date || moment().format("YYYY-MM-DD")} // default if value empty
                           onChange={handleChange}
+                          min={moment().format("YYYY-MM-DD")} // restricts to current or future date
                           required
                         />
                       </Col>
