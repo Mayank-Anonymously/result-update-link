@@ -103,7 +103,12 @@ const Home = () => {
         time: form.time,
         number: form.number,
         next_result: form.next_result,
-        result: form.result,
+        result: [
+          {
+            time: form.time,
+            number: form.number,
+          },
+        ],
         date: form.date,
         key: form.key,
       },
@@ -162,7 +167,6 @@ const Home = () => {
     fetchCategores();
   }, []);
 
-  console.log("getCategories:", "form:", form);
   return (
     <div className="container py-4">
       <Tabs
@@ -275,88 +279,6 @@ const Home = () => {
                           }}
                           required
                         />
-                      </Col>
-
-                      <Col md={12}>
-                        <h6 className="mt-3">Result Entries</h6>
-                        {form.result.map((res, index) => (
-                          <Row className="g-2 mb-2" key={index}>
-                            <Col md={5}>
-                              <Form.Label htmlFor={`result-time-${index}`}>
-                                Time
-                              </Form.Label>
-                              <Form.Control
-                                id={`result-time-${index}`}
-                                type="time"
-                                placeholder="Time"
-                                value={moment(res.time).format("HH:mm")}
-                                onChange={(e) => {
-                                  const time = e.target.value; // "14:10"
-                                  const [hour, minute] = time
-                                    .split(":")
-                                    .map(Number);
-
-                                  const totalMinutes = hour * 60 + minute;
-                                  const roundedMinutes =
-                                    Math.ceil(totalMinutes / 15) * 15;
-
-                                  const roundedHour = Math.floor(
-                                    roundedMinutes / 60
-                                  );
-                                  const roundedMinute = roundedMinutes % 60;
-
-                                  const roundedTime = moment()
-                                    .set({
-                                      hour: roundedHour,
-                                      minute: roundedMinute,
-                                      second: 0,
-                                    })
-                                    .toDate();
-
-                                  const formattedTime =
-                                    moment(roundedTime).format("hh:mm A");
-
-                                  handleResultChange(
-                                    index,
-                                    "time",
-                                    roundedTime.getTime()
-                                  );
-                                }}
-                                required
-                              />
-                            </Col>
-                            <Col md={5}>
-                              <Form.Label htmlFor={`result-number-${index}`}>
-                                Number
-                              </Form.Label>
-                              <Form.Control
-                                id={`result-number-${index}`}
-                                type="number"
-                                placeholder="Number"
-                                value={res.number}
-                                onChange={(e) =>
-                                  handleResultChange(
-                                    index,
-                                    "number",
-                                    e.target.value
-                                  )
-                                }
-                                required
-                              />
-                            </Col>
-                            <Col md={2}>
-                              <Button
-                                variant="danger"
-                                onClick={() => removeResultRow(index)}
-                              >
-                                Remove
-                              </Button>
-                            </Col>
-                          </Row>
-                        ))}
-                        <Button variant="secondary" onClick={addResultRow}>
-                          + Add Result Entry
-                        </Button>
                       </Col>
                     </Row>
 

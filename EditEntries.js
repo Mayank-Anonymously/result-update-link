@@ -9,7 +9,6 @@ export const MyVerticallyCenteredModal = (props) => {
   const [modalShow, setModalShow] = React.useState(false);
 
   const { catname } = props;
-  console.log("catname:", catname);
   const [form, setForm] = useState({
     categoryname: catname,
     time: "",
