@@ -9,6 +9,7 @@ export const MyVerticallyCenteredModal = (props) => {
   const [modalShow, setModalShow] = React.useState(false);
 
   const { catname } = props;
+  console.log("catname:", catname);
   const [form, setForm] = useState({
     categoryname: catname,
     time: "",
@@ -27,13 +28,12 @@ export const MyVerticallyCenteredModal = (props) => {
     updatedResult[index][field] = value;
     setForm({ ...form, result: updatedResult });
   };
-
   const handleAddResult = (e) => {
     e.preventDefault();
 
     const options = {
       method: "PUT",
-      url: "https://ewn-bat-ball.vercel.app/api/update-existing-result",
+      url: `https://ewn-bat-ball.vercel.app/api/update-existing-result/${catname}`,
       headers: {
         "Content-Type": "application/json",
       },

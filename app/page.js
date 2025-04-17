@@ -10,6 +10,10 @@ import { MyVerticallyCenteredModal } from "@/EditEntries";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 import AddCategoryforkey from "@/AddKeyForCategory";
+
+import { FaPencilAlt } from "react-icons/fa";
+import moment from "moment";
+
 const Home = () => {
   const [results, setResults] = useState([]);
   const [modalShow, setModalShow] = React.useState(false);
@@ -29,7 +33,7 @@ const Home = () => {
     const { name, value } = e.target; // value will be like "14:30"
 
     if (name === "time") {
-      const timestamp = moment(value, "HH:mm").valueOf(); // converts to Unix ms
+      const timestamp = moment(value, "HH:mm a").valueOf(); // converts to Unix ms
       setForm((prevForm) => ({
         ...prevForm,
         [name]: timestamp,
@@ -156,7 +160,7 @@ const Home = () => {
     fetchCategores();
   }, []);
 
-  console.log("getCategories:", getCategories);
+  console.log("getCategories:", "form:", form);
   return (
     <div className="container py-4">
       <Tabs
@@ -232,14 +236,25 @@ const Home = () => {
                               <Form.Control
                                 type="time"
                                 placeholder="Time"
-                                value={res.time}
-                                onChange={(e) =>
+                                value={moment(res.time).format("HH:mm")}
+                                onChange={(e) => {
+                                  const time = e.target.value; // Example: "14:15"
+
+                                  const newDate = moment(
+                                    time,
+                                    "HH:mm"
+                                  ).toDate(); // JS Date
+                                  const formattedTime =
+                                    moment(newDate).format("hh:mm A"); // "02:15 PM"
+
+                                  console.log("Formatted Time:", formattedTime); // optional
+
                                   handleResultChange(
                                     index,
                                     "time",
-                                    e.target.value
-                                  )
-                                }
+                                    newDate.getTime()
+                                  ); // or formattedTime, depending on what you want to store
+                                }}
                                 required
                               />
                             </Col>
@@ -278,8 +293,19 @@ const Home = () => {
                           type="time"
                           name="next_result"
                           placeholder="Next Result"
-                          value={form.next_result}
-                          onChange={handleChange}
+                          value={moment(form.next_result).format("HH:mm")}
+                          onChange={(e) => {
+                            const time = e.target.value; // "14:30"
+                            const newDate = moment(time, "HH:mm A").toDate();
+                            const timestamp = newDate.getTime();
+
+                            handleChange({
+                              target: {
+                                name: "next_result",
+                                value: timestamp, // or moment(newDate).format("hh:mm A") if storing formatted string
+                              },
+                            });
+                          }}
                           required
                         />
                       </Col>
@@ -320,8 +346,8 @@ const Home = () => {
                     </thead>
                     <tbody>
                       {results.map((res) => (
-                        <tr key={res.id}>
-                          <td>{res.id}</td>
+                        <tr key={res._id}>
+                          <td>{res._id}</td>
                           <td>{res.categoryname}</td>
                           <td>{res.date}</td>
                           <td>{res.number}</td>
@@ -335,12 +361,12 @@ const Home = () => {
                           <td>{res.next_result}</td>
                           <td>
                             <Button
-                              variant="danger"
+                              variant="primary"
                               size="sm"
-                              onClick={() => handleDelete(res.categoryname)}
+                              onClick={() => handleDelete(res._id)}
                               type="button"
                             >
-                              <MdDeleteForever />
+                              <FaPencilAlt />
                             </Button>
                           </td>
                         </tr>
