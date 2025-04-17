@@ -160,11 +160,11 @@ const Home = () => {
   return (
     <div className="container py-4">
       <Tabs
-        defaultActiveKey="key"
+        defaultActiveKey="category"
         id="uncontrolled-tab-example"
         className="mb-3"
       >
-        <Tab eventKey="key" title="Add Category">
+        <Tab eventKey="category" title="Add Category">
           <AddCategoryforkey />
         </Tab>
         <Tab eventKey="result" title="Add Result">
@@ -185,7 +185,7 @@ const Home = () => {
                           <option value="">Select Category</option>
                           {getCategories.map((item, index) => {
                             return (
-                              <option value={item.categoryname}>
+                              <option value={item.categoryname} key={index}>
                                 {item.categoryname}
                               </option>
                             );
