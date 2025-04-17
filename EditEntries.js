@@ -74,11 +74,38 @@ export const MyVerticallyCenteredModal = (props) => {
             <Col md={4}>
               <label>Time</label>
               <Form.Control
+                id="time"
                 type="time"
                 name="time"
-                placeholder="Date (YYYY-MM-DD)"
-                value={form.time}
-                onChange={handleChange}
+                placeholder="Next Result"
+                value={moment(form.time).format("HH:mm")}
+                onChange={(e) => {
+                  const time = e.target.value;
+                  const [hour, minute] = time.split(":").map(Number);
+
+                  const totalMinutes = hour * 60 + minute;
+                  const roundedMinutes = Math.ceil(totalMinutes / 15) * 15;
+
+                  const roundedHour = Math.floor(roundedMinutes / 60);
+                  const roundedMinute = roundedMinutes % 60;
+
+                  const roundedTime = moment()
+                    .set({
+                      hour: roundedHour,
+                      minute: roundedMinute,
+                      second: 0,
+                    })
+                    .toDate();
+
+                  const timestamp = roundedTime.getTime();
+
+                  handleChange({
+                    target: {
+                      name: "time",
+                      value: timestamp,
+                    },
+                  });
+                }}
                 required
               />
             </Col>
@@ -99,11 +126,38 @@ export const MyVerticallyCenteredModal = (props) => {
               <label>Next Result</label>
 
               <Form.Control
+                id="next_result"
                 type="time"
                 name="next_result"
                 placeholder="Next Result"
-                value={form.next_result}
-                onChange={handleChange}
+                value={moment(form.next_result).format("HH:mm")}
+                onChange={(e) => {
+                  const time = e.target.value;
+                  const [hour, minute] = time.split(":").map(Number);
+
+                  const totalMinutes = hour * 60 + minute;
+                  const roundedMinutes = Math.ceil(totalMinutes / 15) * 15;
+
+                  const roundedHour = Math.floor(roundedMinutes / 60);
+                  const roundedMinute = roundedMinutes % 60;
+
+                  const roundedTime = moment()
+                    .set({
+                      hour: roundedHour,
+                      minute: roundedMinute,
+                      second: 0,
+                    })
+                    .toDate();
+
+                  const timestamp = roundedTime.getTime();
+
+                  handleChange({
+                    target: {
+                      name: "next_result",
+                      value: timestamp,
+                    },
+                  });
+                }}
                 required
               />
             </Col>
