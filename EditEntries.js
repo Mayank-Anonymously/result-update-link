@@ -68,11 +68,7 @@ export const MyVerticallyCenteredModal = (props) => {
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Header closeButton>
-        <Modal.Title id="contained-modal-title-vcenter">
-          Modal heading
-        </Modal.Title>
-      </Modal.Header>
+      <Modal.Header closeButton></Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleAddResult}>
           <Row className="g-3 container">
