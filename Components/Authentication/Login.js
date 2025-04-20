@@ -1,16 +1,43 @@
-// src/components/LoginForm.jsx
-import Link from 'next/link';
+'use client';
 import React, { useState } from 'react';
-import { Form, Button, Card, Container } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { Form, Button, Card, Container, Alert } from 'react-bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { HOST } from '@/static';
 
 const LoginForm = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [error, setError] = useState('');
+	const router = useRouter();
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
-		console.log('Login submitted with:', { email, password });
-		// You can add login logic here
+		setError('');
+
+		try {
+			const response = await fetch(`${HOST}/login`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ email, password }),
+			});
+
+			const data = await response.json();
+
+			if (!response.ok) {
+				throw new Error(data.message || 'Login failed');
+			}
+
+			// Store token in localStorage or cookie
+			localStorage.setItem('authToken', data.authCode);
+
+			// Redirect to result-management page
+			router.push('/result-management');
+		} catch (err) {
+			setError(err.message);
+		}
 	};
 
 	return (
@@ -20,6 +47,9 @@ const LoginForm = () => {
 			<Card style={{ width: '400px' }}>
 				<Card.Body>
 					<h3 className='text-center mb-4'>Login</h3>
+
+					{error && <Alert variant='danger'>{error}</Alert>}
+
 					<Form onSubmit={handleSubmit}>
 						<Form.Group
 							className='mb-3'
@@ -51,7 +81,7 @@ const LoginForm = () => {
 							variant='primary'
 							type='submit'
 							className='w-100'>
-							<Link href='/result-management'>Login</Link>
+							Login
 						</Button>
 					</Form>
 				</Card.Body>

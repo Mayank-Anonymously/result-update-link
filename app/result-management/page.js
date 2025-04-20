@@ -13,6 +13,7 @@ import AddCategoryforkey from '@/AddKeyForCategory';
 
 import { FaPencilAlt } from 'react-icons/fa';
 import moment from 'moment';
+import { HOST } from '@/static';
 
 const getRoundedTime = () => {
 	const now = moment();
@@ -92,9 +93,10 @@ const Home = () => {
 	const apiforResults = () => {
 		const options = {
 			method: 'GET',
-			url: 'https://ewn-bat-ball.vercel.app/api/fetch-result',
+			url: `${HOST}/fetch-result`,
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 			},
 		};
 
@@ -113,9 +115,10 @@ const Home = () => {
 
 		const options = {
 			method: 'POST',
-			url: 'https://ewn-bat-ball.vercel.app/api/result',
+			url: `${HOST}/result`,
 			headers: {
 				'Content-Type': 'application/json',
+				Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 			},
 			data: {
 				categoryname: form.categoryname,
@@ -165,9 +168,10 @@ const Home = () => {
 		const fetchCategores = () => {
 			const options = {
 				method: 'GET',
-				url: 'https://ewn-bat-ball.vercel.app/api/fetch-cate-result',
+				url: `${HOST}/fetch-cate-result`,
 				headers: {
 					'Content-Type': 'application/json',
+					Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 				},
 			};
 
@@ -256,7 +260,6 @@ const Home = () => {
 												className='mt-3'>
 												<Form.Label htmlFor='time'>
 													Result Time Selected Time:{' '}
-													{moment(form.time).format('HH:mm')}
 												</Form.Label>
 												<Form.Control
 													id='time'
@@ -325,7 +328,7 @@ const Home = () => {
 
 														const totalMinutes = hour * 60 + minute;
 														const roundedMinutes =
-															Math.ceil(totalMinutes / 15) * 15;
+															Math.ceil(totalMinutes / 15) * 15 + 15;
 
 														const roundedHour = Math.floor(roundedMinutes / 60);
 														const roundedMinute = roundedMinutes % 60;
