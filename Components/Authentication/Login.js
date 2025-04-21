@@ -1,93 +1,106 @@
-'use client';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Form, Button, Card, Container, Alert } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import { HOST } from '@/static';
+"use client";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Form, Button, Card, Container, Alert, Spinner } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
+import { HOST } from "@/static";
 
 const LoginForm = () => {
-	const [email, setEmail] = useState('');
-	const [password, setPassword] = useState('');
-	const [error, setError] = useState('');
-	const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
-		setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-		try {
-			const response = await fetch(`${HOST}/login`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ email, password }),
-			});
+    try {
+      const response = await fetch(`${HOST}/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-			const data = await response.json();
+      const data = await response.json();
 
-			if (!response.ok) {
-				throw new Error(data.message || 'Login failed');
-			}
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
 
-			// Store token in localStorage or cookie
-			localStorage.setItem('authToken', data.authCode);
+      localStorage.setItem("authToken", data.authCode);
+      router.push("/result-management");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-			// Redirect to result-management page
-			router.push('/result-management');
-		} catch (err) {
-			setError(err.message);
-		}
-	};
+  return (
+    <Container
+      className="d-flex justify-content-center align-items-center"
+      style={{ minHeight: "100vh" }}
+    >
+      <Card style={{ width: "400px" }}>
+        <Card.Body>
+          <h3 className="text-center mb-4">Login</h3>
 
-	return (
-		<Container
-			className='d-flex justify-content-center align-items-center'
-			style={{ minHeight: '100vh' }}>
-			<Card style={{ width: '400px' }}>
-				<Card.Body>
-					<h3 className='text-center mb-4'>Login</h3>
+          {error && <Alert variant="danger">{error}</Alert>}
 
-					{error && <Alert variant='danger'>{error}</Alert>}
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3" controlId="formEmail">
+              <Form.Label>Email address</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-					<Form onSubmit={handleSubmit}>
-						<Form.Group
-							className='mb-3'
-							controlId='formEmail'>
-							<Form.Label>Email address</Form.Label>
-							<Form.Control
-								type='email'
-								placeholder='Enter email'
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								required
-							/>
-						</Form.Group>
+            <Form.Group className="mb-3" controlId="formPassword">
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </Form.Group>
 
-						<Form.Group
-							className='mb-3'
-							controlId='formPassword'>
-							<Form.Label>Password</Form.Label>
-							<Form.Control
-								type='password'
-								placeholder='Password'
-								value={password}
-								onChange={(e) => setPassword(e.target.value)}
-								required
-							/>
-						</Form.Group>
-
-						<Button
-							variant='primary'
-							type='submit'
-							className='w-100'>
-							Login
-						</Button>
-					</Form>
-				</Card.Body>
-			</Card>
-		</Container>
-	);
+            <Button
+              variant="primary"
+              type="submit"
+              className="w-100"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />{" "}
+                  Logging in...
+                </>
+              ) : (
+                "Login"
+              )}
+            </Button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </Container>
+  );
 };
 
 export default LoginForm;

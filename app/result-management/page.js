@@ -145,16 +145,23 @@ const Home = () => {
       .catch(function (error) {
         console.error(error);
       });
-
+    const time = moment().format("HH:mm");
     // Reset form
+    let roundedTime = moment(time, "HH:mm")
+      .add(15 - (moment(time, "HH:mm").minute() % 15), "minutes")
+      .seconds(0);
+
+    // Convert to ISO T format
+    const isoTime = roundedTime.format("YYYY-MM-DDTHH:mm:ss");
+
     setForm({
       categoryname: "",
-      date: "",
       number: "",
       result: [{ time: "", number: "" }],
-      next_result: "",
+      next_result: isoTime,
       key: "",
-      time: "",
+      time: isoTime,
+      date: moment().format("YYYY-MM-DD"),
     });
   };
 
@@ -278,7 +285,6 @@ const Home = () => {
                               "YYYY-MM-DDTHH:mm:ss"
                             );
 
-
                             handleChange({
                               target: {
                                 name: "time",
@@ -327,7 +333,6 @@ const Home = () => {
                             const isoTime = roundedTime.format(
                               "YYYY-MM-DDTHH:mm:ss"
                             );
-
 
                             handleChange({
                               target: {
