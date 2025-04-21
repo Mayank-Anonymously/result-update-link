@@ -262,25 +262,23 @@ const Home = () => {
                           placeholder="Time"
                           value={moment(form.time).format("HH:mm")}
                           onChange={(e) => {
-                            const time = e.target.value;
+                            const time = e.target.value; // e.g., "06:47"
+                            console.log("Selected time:", time);
 
-                            const [hour, minute] = time.split(":").map(Number);
-                            const totalMinutes = hour * 60 + minute;
-                            const roundedMinutes =
-                              Math.ceil(totalMinutes / 15) * 15;
+                            // Use moment to parse and round up to nearest 15 minutes
+                            let roundedTime = moment(time, "HH:mm")
+                              .add(
+                                15 - (moment(time, "HH:mm").minute() % 15),
+                                "minutes"
+                              )
+                              .seconds(0);
 
-                            const roundedHour = Math.floor(roundedMinutes / 60);
-                            const roundedMinute = roundedMinutes % 60;
+                            // Convert to ISO T format
+                            const isoTime = roundedTime.format(
+                              "YYYY-MM-DDTHH:mm:ss"
+                            );
 
-                            const now = new Date();
-                            now.setHours(roundedHour);
-                            now.setMinutes(roundedMinute);
-                            now.setSeconds(0);
-                            now.setMilliseconds(0);
 
-                            // Get ISO 8601 timestamp in T format
-                            const isoTime = now.toISOString().slice(0, 19); // e.g. "2025-04-21T08:45:00"
-                            console.log("isoTime:", isoTime);
                             handleChange({
                               target: {
                                 name: "time",
@@ -314,23 +312,22 @@ const Home = () => {
                           placeholder="Next Result"
                           value={moment(form.next_result).format("HH:mm")}
                           onChange={(e) => {
-                            const time = e.target.value;
-                            const [hour, minute] = time.split(":").map(Number);
+                            const time = e.target.value; // e.g., "06:47"
+                            console.log("Selected time:", time);
 
-                            const totalMinutes = hour * 60 + minute;
-                            const roundedMinutes =
-                              Math.ceil(totalMinutes / 15) * 15 + 15;
+                            // Use moment to parse and round up to nearest 15 minutes
+                            let roundedTime = moment(time, "HH:mm")
+                              .add(
+                                15 - (moment(time, "HH:mm").minute() % 15),
+                                "minutes"
+                              )
+                              .seconds(0);
 
-                            const roundedHour = Math.floor(roundedMinutes / 60);
-                            const roundedMinute = roundedMinutes % 60;
+                            // Convert to ISO T format
+                            const isoTime = roundedTime.format(
+                              "YYYY-MM-DDTHH:mm:ss"
+                            );
 
-                            const now = new Date();
-                            now.setHours(roundedHour);
-                            now.setMinutes(roundedMinute);
-                            now.setSeconds(0);
-                            now.setMilliseconds(0);
-
-                            const isoTime = now.toISOString().slice(0, 19); // "YYYY-MM-DDTHH:mm:ss"
 
                             handleChange({
                               target: {
@@ -387,16 +384,11 @@ const Home = () => {
                           <td>
                             {res.result.map((r, i) => (
                               <div key={i}>
-                                {moment(parseInt(r.time)).format("HH:mm A")} -{" "}
-                                {r.number}
+                                {moment(r.time).format("HH:mm")} - {r.number}
                               </div>
                             ))}
                           </td>
-                          <td>
-                            {moment(parseInt(res.next_result)).format(
-                              "HH:mm A"
-                            )}
-                          </td>
+                          <td>{moment(res.next_result).format("HH:mm")}</td>
                           <td>
                             <Button
                               variant="primary"

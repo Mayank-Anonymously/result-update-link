@@ -80,32 +80,24 @@ export const MyVerticallyCenteredModal = (props) => {
                 id="time"
                 type="time"
                 name="time"
-                placeholder="Next Result"
+                placeholder="Time"
                 value={moment(form.time).format("HH:mm")}
                 onChange={(e) => {
-                  const time = e.target.value;
-                  const [hour, minute] = time.split(":").map(Number);
+                  const time = e.target.value; // e.g., "06:47"
+                  console.log("Selected time:", time);
 
-                  const totalMinutes = hour * 60 + minute;
-                  const roundedMinutes = Math.ceil(totalMinutes / 15) * 15;
+                  // Use moment to parse and round up to nearest 15 minutes
+                  let roundedTime = moment(time, "HH:mm")
+                    .add(15 - (moment(time, "HH:mm").minute() % 15), "minutes")
+                    .seconds(0);
 
-                  const roundedHour = Math.floor(roundedMinutes / 60);
-                  const roundedMinute = roundedMinutes % 60;
-
-                  const roundedTime = moment()
-                    .set({
-                      hour: roundedHour,
-                      minute: roundedMinute,
-                      second: 0,
-                    })
-                    .toDate();
-
-                  const timestamp = roundedTime.getTime();
+                  // Convert to ISO T format
+                  const isoTime = roundedTime.format("YYYY-MM-DDTHH:mm:ss");
 
                   handleChange({
                     target: {
                       name: "time",
-                      value: timestamp,
+                      value: isoTime,
                     },
                   });
                 }}
@@ -135,30 +127,21 @@ export const MyVerticallyCenteredModal = (props) => {
                 placeholder="Next Result"
                 value={moment(form.next_result).format("HH:mm")}
                 onChange={(e) => {
-                  console.log(e.target.value);
-                  const time = e.target.value;
-                  const [hour, minute] = time.split(":").map(Number);
+                  const time = e.target.value; // e.g., "06:47"
+                  console.log("Selected time:", time);
 
-                  const totalMinutes = hour * 60 + minute;
-                  const roundedMinutes = Math.ceil(totalMinutes / 15) * 15;
+                  // Use moment to parse and round up to nearest 15 minutes
+                  let roundedTime = moment(time, "HH:mm")
+                    .add(15 - (moment(time, "HH:mm").minute() % 15), "minutes")
+                    .seconds(0);
 
-                  const roundedHour = Math.floor(roundedMinutes / 60);
-                  const roundedMinute = roundedMinutes % 60;
-
-                  const roundedTime = moment()
-                    .set({
-                      hour: roundedHour,
-                      minute: roundedMinute,
-                      second: 0,
-                    })
-                    .toDate();
-
-                  const timestamp = roundedTime.getTime();
+                  // Convert to ISO T format
+                  const isoTime = roundedTime.format("YYYY-MM-DDTHH:mm:ss");
 
                   handleChange({
                     target: {
                       name: "next_result",
-                      value: timestamp,
+                      value: isoTime,
                     },
                   });
                 }}
