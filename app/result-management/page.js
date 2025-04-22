@@ -394,16 +394,6 @@ const Home = () => {
                             ))}
                           </td>
                           <td>{moment(res.next_result).format("HH:mm")}</td>
-                          <td>
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              onClick={() => handleDelete(res._id)}
-                              type="button"
-                            >
-                              <FaPencilAlt />
-                            </Button>
-                          </td>
                         </tr>
                       ))}
                     </tbody>

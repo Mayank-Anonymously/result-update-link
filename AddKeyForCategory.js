@@ -103,16 +103,16 @@ const AddCategoryforkey = () => {
 											onChange={handleChange}
 											required>
 											<option value=''>Select Category</option>
-											<option value='Minisdesawr DELHI'>
+											<option value='Minisdesawar DELHI'>
 												MiniDesawar Delhi
 											</option>
-											<option value='Minisdesawr MUMBAI'>
+											<option value='Minisdesawar MUMBAI'>
 												MiniDesawar Mumbai
 											</option>
-											<option value='Minisdesawr KOLKATA'>
+											<option value='Minisdesawar KOLKATA'>
 												MiniDesawar Kolkata
 											</option>
-											<option value='Minisdesawr HYDERABAD'>
+											<option value='Minisdesawar HYDERABAD'>
 												MiniDesawar Hyderabad
 											</option>
 											<option value='SHARJAH'>Sharjah</option>
