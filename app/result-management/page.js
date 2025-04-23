@@ -225,7 +225,7 @@ const Home = () => {
                           required
                         >
                           <option value="">Select Category</option>
-                          {getCategories.map((item, index) => (
+                          {getCategories?.map((item, index) => (
                             <option value={item.categoryname} key={index}>
                               {item.categoryname}
                             </option>
@@ -319,12 +319,11 @@ const Home = () => {
                           value={moment(form.next_result).format("HH:mm")}
                           onChange={(e) => {
                             const time = e.target.value; // e.g., "06:47"
-                            console.log("Selected time:", time);
 
                             // Use moment to parse and round up to nearest 15 minutes
                             let roundedTime = moment(time, "HH:mm")
                               .add(
-                                15 - (moment(time, "HH:mm").minute() % 15),
+                                30 - (moment(time, "HH:mm").minute() % 15),
                                 "minutes"
                               )
                               .seconds(0);
