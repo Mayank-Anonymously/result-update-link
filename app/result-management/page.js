@@ -33,6 +33,24 @@ const getRoundedTime = () => {
     .valueOf(); // returns timestamp in ms
 };
 
+const getRounded30Time = () => {
+  const now = moment();
+  const totalMinutes = now.hours() * 60 + now.minutes();
+  const roundedMinutes = Math.ceil(totalMinutes / 12) * 15;
+
+  const roundedHour = Math.floor(roundedMinutes / 60);
+  const roundedMinute = roundedMinutes % 60;
+
+  return moment()
+    .set({
+      hour: roundedHour,
+      minute: roundedMinute,
+      second: 0,
+      millisecond: 0,
+    })
+    .valueOf(); // returns timestamp in ms
+};
+
 const Home = () => {
   const [results, setResults] = useState([]);
   const [modalShow, setModalShow] = React.useState(false);
@@ -43,7 +61,7 @@ const Home = () => {
     date: moment().format("YYYY-MM-DD"), // 👈 default today's date,
     number: "",
     result: [{ time: "", number: "" }],
-    next_result: getRoundedTime(),
+    next_result: getRounded30Time(),
     key: "",
     time: getRoundedTime(),
   });
@@ -140,7 +158,6 @@ const Home = () => {
       .request(options)
       .then(function (response) {
         apiforResults();
-        console.log(response.data);
       })
       .catch(function (error) {
         console.error(error);
@@ -154,11 +171,18 @@ const Home = () => {
     // Convert to ISO T format
     const isoTime = roundedTime.format("YYYY-MM-DDTHH:mm:ss");
 
+    let roundedTime30 = moment(time, "HH:mm")
+      .add(30 - (moment(time, "HH:mm").minute() % 15), "minutes")
+      .seconds(0);
+
+    // Convert to ISO T format
+    const isoTime30 = roundedTime30.format("YYYY-MM-DDTHH:mm:ss");
+
     setForm({
       categoryname: "",
       number: "",
       result: [{ time: "", number: "" }],
-      next_result: isoTime,
+      next_result: isoTime30,
       key: "",
       time: isoTime,
       date: moment().format("YYYY-MM-DD"),
@@ -316,14 +340,15 @@ const Home = () => {
                           type="time"
                           name="next_result"
                           placeholder="Next Result"
+                          disabled={true}
                           value={moment(form.next_result).format("HH:mm")}
                           onChange={(e) => {
-                            const time = e.target.value; // e.g., "06:47"
+                            const time = form.time; // e.g., "06:47"
 
                             // Use moment to parse and round up to nearest 15 minutes
                             let roundedTime = moment(time, "HH:mm")
                               .add(
-                                30 - (moment(time, "HH:mm").minute() % 15),
+                                15 - (moment(time, "HH:mm").minute() % 15),
                                 "minutes"
                               )
                               .seconds(0);
