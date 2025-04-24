@@ -212,12 +212,27 @@ const Home = () => {
 											<Col md={4}>
 												<Form.Label>Number</Form.Label>
 												<Form.Control
-													type='number'
+													type='text'
 													name='number'
 													value={form.number}
-													onChange={handleChange}
+													onChange={(e) => {
+														const val = e.target.value.replace(/\D/g, ''); // Remove non-digits
+														if (val.length <= 4) {
+															setForm((prev) => ({
+																...prev,
+																number: val,
+															}));
+														}
+													}}
+													maxLength={4}
 													required
+													placeholder='Enter 4-digit number'
 												/>
+												{form.number.length > 0 && form.number.length !== 4 && (
+													<div style={{ color: 'red', fontSize: '0.9rem' }}>
+														Number must be exactly 4 digits.
+													</div>
+												)}
 											</Col>
 											<Col
 												md={4}
