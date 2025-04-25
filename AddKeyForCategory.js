@@ -104,17 +104,15 @@ const AddCategoryforkey = () => {
                       required
                     >
                       <option value="">Select Category</option>
-                      <option value="MiniDiswar DELHI">
-                        MiniDesawar Delhi
-                      </option>
+                      <option value="MiniDiswar DELHI">MiniDiswar Delhi</option>
                       <option value="MiniDiswar MUMBAI">
-                        MiniDesawar Mumbai
+                        MiniDiswar Mumbai
                       </option>
                       <option value="MiniDiswar KOLKATA">
-                        MiniDesawar Kolkata
+                        MiniDiswar Kolkata
                       </option>
                       <option value="MiniDiswar HYDERABAD">
-                        MiniDesawar Hyderabad
+                        MiniDiswar Hyderabad
                       </option>
                       <option value="MiniDiswar SHARJAH">
                         MiniDiswar Sharjah
