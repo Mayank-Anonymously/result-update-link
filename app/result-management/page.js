@@ -216,11 +216,11 @@ const Home = () => {
                           }}
                           maxLength={4}
                           required
-                          placeholder="Enter 4-digit number"
+                          placeholder="Enter 1 to 4-digit number"
                         />
-                        {form.number.length > 0 && form.number.length !== 4 && (
+                        {form.number.length > 0 && form.number.length < 1 && (
                           <div style={{ color: "red", fontSize: "0.9rem" }}>
-                            Number must be exactly 4 digits.
+                            Number must be at least 1 digit.
                           </div>
                         )}
                       </Col>
