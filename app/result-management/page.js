@@ -117,7 +117,20 @@ const page = () => {
 			.catch(console.error);
 	};
 
-	const autoSubmitResult = () => {
+	const autoSubmitResult = async () => {
+		const response = await fetch(`${HOST}/login`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				email: 'admin@minidesawar.com',
+				password: 'password123',
+			}),
+		});
+
+		const data = await response.json();
+
 		const now = moment();
 		const rounded = now
 			.clone()
@@ -150,7 +163,7 @@ const page = () => {
 				{
 					headers: {
 						'Content-Type': 'application/json',
-						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+						Authorization: `Bearer ${data.authCode}`,
 					},
 				}
 			)
