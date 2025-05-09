@@ -10,7 +10,6 @@ import AddCategoryforkey from '@/AddKeyForCategory';
 import moment from 'moment';
 import { HOST } from '@/static';
 
-// Round time to next 15 minutes in ISO format
 const getRoundedISOTime = () => {
 	const now = moment();
 	const rounded = now
@@ -22,13 +21,11 @@ const getRoundedISOTime = () => {
 
 const Home = () => {
 	const roundedTimeISO = getRoundedISOTime();
-	const nextResultISO = moment(roundedTimeISO).add(30, 'minutes').toISOString();
+	const nextResultISO = moment(roundedTimeISO).add(15, 'minutes').toISOString();
 
 	const [results, setResults] = useState([]);
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
-	const [getCategories, setCategories] = useState([]);
-
 	const [form, setForm] = useState({
 		categoryname: '',
 		date: moment().format('YYYY-MM-DD'),
@@ -38,6 +35,8 @@ const Home = () => {
 		key: '',
 		time: roundedTimeISO,
 	});
+
+	const [lastManualSubmit, setLastManualSubmit] = useState(null);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -50,7 +49,7 @@ const Home = () => {
 				.clone()
 				.startOf('minute')
 				.add(15 - (selectedTime.minute() % 15), 'minutes');
-			const next = rounded.clone().add(30, 'minutes');
+			const next = rounded.clone().add(15, 'minutes');
 
 			setForm((prev) => ({
 				...prev,
@@ -67,7 +66,6 @@ const Home = () => {
 
 	const handleAddResult = (e) => {
 		e.preventDefault();
-
 		axios
 			.post(
 				`${HOST}/result`,
@@ -89,9 +87,10 @@ const Home = () => {
 			)
 			.then(() => {
 				apiforResults();
+				setLastManualSubmit(moment());
 				const newRoundedTime = getRoundedISOTime();
 				const newNextResult = moment(newRoundedTime)
-					.add(30, 'minutes')
+					.add(15, 'minutes')
 					.toISOString();
 				setForm({
 					categoryname: '',
@@ -118,23 +117,60 @@ const Home = () => {
 			.catch(console.error);
 	};
 
+	const autoSubmitResult = () => {
+		const now = moment();
+		const rounded = now
+			.clone()
+			.startOf('minute')
+			.add(15 - (now.minute() % 15), 'minutes');
+		const next = rounded.clone().add(15, 'minutes');
+
+		if (lastManualSubmit && now.diff(lastManualSubmit, 'minutes') < 14) return;
+
+		const alreadyExists = results.some(
+			(r) => moment(r.time).format('HH:mm') === rounded.format('HH:mm')
+		);
+		if (alreadyExists) return;
+
+		const randomNum = Math.floor(Math.random() * 99) + 1;
+		const formattedNumber = randomNum.toString().padStart(2, '0');
+
+		axios
+			.post(
+				`${HOST}/result`,
+				{
+					categoryname: 'Minisdesawar',
+					time: rounded.toISOString(),
+					number: formattedNumber,
+					next_result: next.toISOString(),
+					result: [{ time: rounded.toISOString(), number: formattedNumber }],
+					date: moment().format('YYYY-MM-DD'),
+					key: 'auto-generated',
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+					},
+				}
+			)
+			.then(() => apiforResults())
+			.catch(console.error);
+	};
+
 	const handleDelete = (id) => {
 		setModalShow(true);
 		setCatName(id);
 	};
 
 	useEffect(() => {
-		axios
-			.get(`${HOST}/fetch-cate-result`, {
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-				},
-			})
-			.then((res) => setCategories(res.data.data))
-			.catch(console.error);
+		apiforResults();
 
-		const interval = setInterval(apiforResults, 1000);
+		const interval = setInterval(() => {
+			apiforResults();
+			autoSubmitResult();
+		}, 60000);
+
 		return () => clearInterval(interval);
 	}, []);
 
@@ -161,20 +197,14 @@ const Home = () => {
 										<Row className='g-3 container'>
 											<Col md={4}>
 												<Form.Label>Category</Form.Label>
-												<Form.Select
+												<Form.Control
+													type='text'
 													name='categoryname'
 													value={form.categoryname}
 													onChange={handleChange}
-													required>
-													<option value=''>Select Category</option>
-													{getCategories?.map((cat, i) => (
-														<option
-															key={i}
-															value={cat.categoryname}>
-															{cat.categoryname}
-														</option>
-													))}
-												</Form.Select>
+													placeholder='Enter Category'
+													required
+												/>
 											</Col>
 											<Col md={4}>
 												<Form.Label>Key</Form.Label>
@@ -216,7 +246,7 @@ const Home = () => {
 													name='number'
 													value={form.number}
 													onChange={(e) => {
-														const val = e.target.value.replace(/\D/g, ''); // Remove non-digits
+														const val = e.target.value.replace(/\D/g, '');
 														if (val.length <= 4) {
 															setForm((prev) => ({
 																...prev,
@@ -226,7 +256,7 @@ const Home = () => {
 													}}
 													maxLength={4}
 													required
-													placeholder='Enter 4-digit number'
+													placeholder='Enter number'
 												/>
 												{form.number.length > 0 && form.number.length !== 4 && (
 													<div style={{ color: 'red', fontSize: '0.9rem' }}>
