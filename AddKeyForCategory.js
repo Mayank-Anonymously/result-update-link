@@ -166,4 +166,4 @@ const AddCategoryforkey = () => {
 	);
 };
 
-export default Home;
+export default AddCategoryforkey;
