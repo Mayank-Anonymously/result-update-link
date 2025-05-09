@@ -27,12 +27,12 @@ const page = () => {
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
 	const [form, setForm] = useState({
-		categoryname: '',
+		categoryname: 'Minisdesawar',
 		date: moment().format('YYYY-MM-DD'),
 		number: '',
 		result: [{ time: '', number: '' }],
 		next_result: nextResultISO,
-		key: '',
+		key: 'md-9281',
 		time: roundedTimeISO,
 	});
 
@@ -182,7 +182,7 @@ const page = () => {
 		const interval = setInterval(() => {
 			apiforResults();
 			autoSubmitResult();
-		}, 60000);
+		}, 15 * 60 * 1000);
 
 		return () => clearInterval(interval);
 	}, []);
