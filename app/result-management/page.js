@@ -145,7 +145,7 @@ const page = () => {
 					next_result: next.toISOString(),
 					result: [{ time: rounded.toISOString(), number: formattedNumber }],
 					date: moment().format('YYYY-MM-DD'),
-					key: 'auto-generated',
+					key: 'md-9281',
 				},
 				{
 					headers: {
@@ -154,7 +154,7 @@ const page = () => {
 					},
 				}
 			)
-			.then(() => apiforResults())
+			.then((response) => apiforResults())
 			.catch(console.error);
 	};
 
@@ -247,20 +247,20 @@ const page = () => {
 													value={form.number}
 													onChange={(e) => {
 														const val = e.target.value.replace(/\D/g, '');
-														if (val.length <= 4) {
+														if (val.length <= 2) {
 															setForm((prev) => ({
 																...prev,
 																number: val,
 															}));
 														}
 													}}
-													maxLength={4}
+													maxLength={2}
 													required
 													placeholder='Enter number'
 												/>
-												{form.number.length > 0 && form.number.length !== 4 && (
+												{form.number.length > 0 && form.number.length !== 2 && (
 													<div style={{ color: 'red', fontSize: '0.9rem' }}>
-														Number must be exactly 4 digits.
+														Number must be exactly 2 digits.
 													</div>
 												)}
 											</Col>

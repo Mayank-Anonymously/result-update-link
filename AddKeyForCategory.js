@@ -103,38 +103,7 @@ const AddCategoryforkey = () => {
 											onChange={handleChange}
 											required>
 											<option value=''>Select Category</option>
-											<option value='MiniDiswar DELHI'>MiniDiswar Delhi</option>
-											<option value='MiniDiswar MUMBAI'>
-												MiniDiswar Mumbai
-											</option>
-											<option value='MiniDiswar KOLKATA'>
-												MiniDiswar Kolkata
-											</option>
-											<option value='MiniDiswar HYDERABAD'>
-												MiniDiswar Hyderabad
-											</option>
-											<option value='MiniDiswar SHARJAH'>
-												MiniDiswar Sharjah
-											</option>
-											<option value='MiniDiswar 4 MINAR'>
-												MiniDiswar 4 Minar
-											</option>
-											<option value='MiniDiswar GURGAON'>
-												MiniDiswar Gurgaon
-											</option>
-											<option value='MiniDiswar KALYAN'>
-												MiniDiswar Kalyan
-											</option>
-											<option value='MiniDiswar FARIDABAD'>
-												MiniDiswar Faridabad
-											</option>
-											<option value='MiniDiswar DESAWAR'>
-												MiniDiswar Desawar
-											</option>
-											<option value='MiniDiswar GHAZIABAD'>
-												MiniDiswar Gaziabad
-											</option>
-											<option value='MiniDiswar GALI'>MiniDiswar Gali</option>
+											<option value='MiniDiswar'>MiniDiswar</option>
 										</Form.Select>
 									</Col>
 
