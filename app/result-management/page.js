@@ -19,7 +19,7 @@ const getRoundedISOTime = () => {
 	return rounded.toISOString();
 };
 
-const Home = () => {
+const page = () => {
 	const roundedTimeISO = getRoundedISOTime();
 	const nextResultISO = moment(roundedTimeISO).add(15, 'minutes').toISOString();
 
@@ -344,4 +344,4 @@ const Home = () => {
 	);
 };
 
-export default Home;
+export default page;
