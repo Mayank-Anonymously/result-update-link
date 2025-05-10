@@ -27,6 +27,7 @@ const page = () => {
 	const [results, setResults] = useState([]);
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
+
 	const [form, setForm] = useState({
 		categoryname: 'Minisdesawar',
 		date: moment().format('YYYY-MM-DD'),
@@ -98,15 +99,6 @@ const page = () => {
 				const newNextResult = moment(newRoundedTime)
 					.add(15, 'minutes')
 					.toISOString();
-				setForm({
-					categoryname: '',
-					number: '',
-					result: [{ time: '', number: '' }],
-					next_result: newNextResult,
-					key: '',
-					time: newRoundedTime,
-					date: moment().format('YYYY-MM-DD'),
-				});
 			})
 			.catch(console.error);
 	};
