@@ -27,9 +27,9 @@ const page = () => {
 	const [results, setResults] = useState([]);
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
-
+	const [loading, setLoading] = useState(false);
 	const [form, setForm] = useState({
-		categoryname: 'Minisdesawar',
+		categoryname: 'Minidiswar',
 		date: moment().format('YYYY-MM-DD'),
 		number: '',
 		result: [{ time: '', number: '' }],
@@ -153,7 +153,7 @@ const page = () => {
 			.post(
 				`${HOST}/result`,
 				{
-					categoryname: 'Minisdesawar',
+					categoryname: 'Minidiswar',
 					time: rounded.toISOString(),
 					number: formattedNumber,
 					next_result: next.toISOString(),
