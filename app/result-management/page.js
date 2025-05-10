@@ -9,6 +9,7 @@ import Tabs from 'react-bootstrap/Tabs';
 import AddCategoryforkey from '@/AddKeyForCategory';
 import moment from 'moment';
 import { HOST } from '@/static';
+import { useRouter } from 'next/navigation';
 
 const getRoundedISOTime = () => {
 	const now = moment();
@@ -22,7 +23,7 @@ const getRoundedISOTime = () => {
 const page = () => {
 	const roundedTimeISO = getRoundedISOTime();
 	const nextResultISO = moment(roundedTimeISO).add(15, 'minutes').toISOString();
-
+	const router = useRouter();
 	const [results, setResults] = useState([]);
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
@@ -35,8 +36,13 @@ const page = () => {
 		key: 'md-9281',
 		time: roundedTimeISO,
 	});
-
 	const [lastManualSubmit, setLastManualSubmit] = useState(null);
+
+	// Logout function
+	const handleLogout = () => {
+		localStorage.removeItem('authToken');
+		router.push('/'); // or use router.push('/login') if using Next.js routing
+	};
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -118,14 +124,17 @@ const page = () => {
 	};
 
 	const autoSubmitResult = async () => {
+		var email = localStorage.getItem('email');
+		var password = localStorage.getItem('password');
+
 		const response = await fetch(`${HOST}/login`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				email: 'admin@minidesawar.com',
-				password: 'password123',
+				email: email,
+				password: password,
 			}),
 		});
 
@@ -167,7 +176,7 @@ const page = () => {
 					},
 				}
 			)
-			.then((response) => apiforResults())
+			.then(() => apiforResults())
 			.catch(console.error);
 	};
 
@@ -182,22 +191,26 @@ const page = () => {
 		const interval = setInterval(() => {
 			apiforResults();
 			autoSubmitResult();
-		}, 15 * 60 * 1000);
+		}, 900000);
 
 		return () => clearInterval(interval);
 	}, []);
 
 	return (
 		<div className='container py-4'>
+			{/* Logout button */}
+			<div className='d-flex justify-content-end mb-3'>
+				<Button
+					variant='danger'
+					onClick={handleLogout}>
+					Logout
+				</Button>
+			</div>
+
 			<Tabs
-				defaultActiveKey='category'
+				defaultActiveKey='result'
 				id='tabs-example'
 				className='mb-3'>
-				<Tab
-					eventKey='category'
-					title='Add Category'>
-					<AddCategoryforkey />
-				</Tab>
 				<Tab
 					eventKey='result'
 					title='Add Result'>

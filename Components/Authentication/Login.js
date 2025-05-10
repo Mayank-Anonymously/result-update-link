@@ -31,6 +31,8 @@ const LoginForm = () => {
 			if (!response.ok) {
 				throw new Error(data.message || 'Login failed');
 			}
+			localStorage.setItem('email', email);
+			localStorage.setItem('password', password);
 
 			localStorage.setItem('authToken', data.authCode);
 			router.push('/result-management');
