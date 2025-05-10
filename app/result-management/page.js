@@ -177,14 +177,31 @@ const page = () => {
 	};
 
 	useEffect(() => {
-		apiforResults();
+		apiforResults(); // Initial call to apiforResults
 
+		const roundedTimeInMilliseconds = getRoundedISOTime(); // Get the next rounded time in milliseconds
+		const currentTimeInMilliseconds = moment().valueOf(); // Get current time in milliseconds
+
+		// Calculate the delay before the first execution
+		const delay = roundedTimeInMilliseconds - currentTimeInMilliseconds;
+
+		// Set the interval based on the rounded time, with an additional delay before the first execution
 		const interval = setInterval(() => {
 			apiforResults();
 			autoSubmitResult();
-		}, 15 * 60 * 1000);
+		}, 15 * 60 * 1000); // Set interval to 15 minutes (in milliseconds)
 
-		return () => clearInterval(interval);
+		// Delay the first execution based on the rounded time
+		if (delay > 0) {
+			setTimeout(() => {
+				apiforResults();
+				autoSubmitResult();
+			}, delay); // Delay the first execution
+		}
+
+		return () => {
+			clearInterval(interval); // Clear the interval when the component unmounts
+		};
 	}, []);
 
 	return (
