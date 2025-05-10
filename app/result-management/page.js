@@ -182,7 +182,7 @@ const page = () => {
 		const interval = setInterval(() => {
 			apiforResults();
 			autoSubmitResult();
-		}, 1000);
+		}, 15 * 60 * 1000);
 
 		return () => clearInterval(interval);
 	}, []);
