@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, Button, Card, Container, Alert, Spinner } from 'react-bootstrap';
@@ -41,6 +42,11 @@ const LoginForm = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+
+	const handleForgotPassword = () => {
+		// Replace with the correct reset password route
+		router.push('/reset-password');
 	};
 
 	return (
@@ -101,6 +107,16 @@ const LoginForm = () => {
 							)}
 						</Button>
 					</Form>
+
+					{/* Forgot Password Link */}
+					<div className='mt-3 text-center'>
+						<Button
+							variant='link'
+							className='text-decoration-none'
+							onClick={handleForgotPassword}>
+							Forgot Password?
+						</Button>
+					</div>
 				</Card.Body>
 			</Card>
 		</Container>
