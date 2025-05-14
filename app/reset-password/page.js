@@ -66,7 +66,7 @@ const PasswordResetForm = () => {
 			const data = await res.json();
 			if (!res.ok) throw new Error(data.message || 'Password reset failed');
 			// On success you might redirect to login
-			router.push('/login');
+			router.push('/');
 		} catch (err) {
 			setError(err.message);
 		} finally {
