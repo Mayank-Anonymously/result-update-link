@@ -179,13 +179,6 @@ const page = () => {
 
 	useEffect(() => {
 		apiforResults();
-
-		const interval = setInterval(() => {
-			apiforResults();
-			autoSubmitResult();
-		}, 900000);
-
-		return () => clearInterval(interval);
 	}, []);
 
 	return (
