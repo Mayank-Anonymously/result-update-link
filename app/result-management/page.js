@@ -109,13 +109,10 @@ const page = () => {
           },
         }
       )
-      .then(() => {
+      .then((response) => {
         apiforResults();
         setLastManualSubmit(moment());
-        const newRoundedTime = getRoundedISOTime();
-        const newNextResult = moment(newRoundedTime)
-          .add(15, "minutes")
-          .toISOString();
+        console.log(response);
       })
       .catch(console.error);
   };
