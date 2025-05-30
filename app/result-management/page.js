@@ -112,7 +112,7 @@ const page = () => {
       .then((response) => {
         apiforResults();
         setLastManualSubmit(moment());
-        console.log(response);
+        alert(response.data.message);
       })
       .catch(console.error);
   };
@@ -131,7 +131,7 @@ const page = () => {
 
   const sortedData = (results) => {
     setResultsdata(
-      combinedData.map((doc) => {
+      results.map((doc) => {
         // Sort each 'result' array inside each document
         const sortedResult = [...doc.result].sort(
           (a, b) => new Date(b.time) - new Date(a.time)
