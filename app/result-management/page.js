@@ -391,7 +391,7 @@ const page = () => {
 																				size='sm'
 																				variant='warning'
 																				className='me-2'
-																				onClick={() => handleEdit(res._id)}>
+																				onClick={() => handleEdit(res)}>
 																				Edit
 																			</Button>
 																			<Button
