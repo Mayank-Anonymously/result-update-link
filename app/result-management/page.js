@@ -27,6 +27,7 @@ const page = () => {
 	const [results, setResults] = useState([]);
 	const [modalShow, setModalShow] = useState(false);
 	const [catName, setCatName] = useState('');
+	const [selectedResult, setSelectedResult] = useState(null); // for edit
 	const [loading, setLoading] = useState(false);
 	const [form, setForm] = useState({
 		categoryname: 'Minidiswar',
@@ -42,7 +43,7 @@ const page = () => {
 	// Logout function
 	const handleLogout = () => {
 		localStorage.removeItem('authToken');
-		router.push('/'); // or use router.push('/login') if using Next.js routing
+		router.push('/');
 	};
 
 	const handleChange = (e) => {
@@ -73,34 +74,105 @@ const page = () => {
 
 	const handleAddResult = (e) => {
 		e.preventDefault();
-		axios
-			.post(
-				`${HOST}/result`,
-				{
-					categoryname: form.categoryname,
-					time: form.time,
-					number: form.number,
-					next_result: form.next_result,
-					result: [{ time: form.time, number: form.number }],
-					date: form.date,
-					key: form.key,
-				},
-				{
+		if (selectedResult) {
+			// Update existing result
+			axios
+				.put(
+					`${HOST}/result/${selectedResult._id}`,
+					{
+						categoryname: form.categoryname,
+						time: form.time,
+						number: form.number,
+						next_result: form.next_result,
+						result: [{ time: form.time, number: form.number }],
+						date: form.date,
+						key: form.key,
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+						},
+					}
+				)
+				.then(() => {
+					apiforResults();
+					setSelectedResult(null); // reset
+					resetForm();
+				})
+				.catch(console.error);
+		} else {
+			// Add new result
+			axios
+				.post(
+					`${HOST}/result`,
+					{
+						categoryname: form.categoryname,
+						time: form.time,
+						number: form.number,
+						next_result: form.next_result,
+						result: [{ time: form.time, number: form.number }],
+						date: form.date,
+						key: form.key,
+					},
+					{
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+						},
+					}
+				)
+				.then(() => {
+					apiforResults();
+					setLastManualSubmit(moment());
+					resetForm();
+				})
+				.catch(console.error);
+		}
+	};
+
+	const resetForm = () => {
+		const newRoundedTime = getRoundedISOTime();
+		const newNextResult = moment(newRoundedTime)
+			.add(15, 'minutes')
+			.toISOString();
+		setForm({
+			categoryname: 'Minidiswar',
+			date: moment().format('YYYY-MM-DD'),
+			number: '',
+			result: [{ time: '', number: '' }],
+			next_result: newNextResult,
+			key: 'md-9281',
+			time: newRoundedTime,
+		});
+	};
+
+	const handleEdit = (res) => {
+		setSelectedResult(res);
+		setForm({
+			categoryname: res.categoryname,
+			date: res.date,
+			number: res.number,
+			result: res.result,
+			next_result: res.next_result,
+			key: res.key,
+			time: res.time,
+		});
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+		router.push(`/edit/${res._id}`);
+	};
+
+	const handleDelete = (id) => {
+		if (confirm('Are you sure you want to delete this result?')) {
+			axios
+				.delete(`${HOST}/result/${id}`, {
 					headers: {
-						'Content-Type': 'application/json',
 						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 					},
-				}
-			)
-			.then(() => {
-				apiforResults();
-				setLastManualSubmit(moment());
-				const newRoundedTime = getRoundedISOTime();
-				const newNextResult = moment(newRoundedTime)
-					.add(15, 'minutes')
-					.toISOString();
-			})
-			.catch(console.error);
+				})
+				.then(() => apiforResults())
+				.catch(console.error);
+		}
 	};
 
 	const apiforResults = () => {
@@ -115,72 +187,29 @@ const page = () => {
 			.catch(console.error);
 	};
 
-	const autoSubmitResult = async () => {
-		var email = localStorage.getItem('email');
-		var password = localStorage.getItem('password');
-
-		const response = await fetch(`${HOST}/login`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				email: email,
-				password: password,
-			}),
-		});
-
-		const data = await response.json();
-
-		const now = moment();
-		const rounded = now
-			.clone()
-			.startOf('minute')
-			.add(15 - (now.minute() % 15), 'minutes');
-		const next = rounded.clone().add(15, 'minutes');
-
-		if (lastManualSubmit && now.diff(lastManualSubmit, 'minutes') < 14) return;
-
-		const alreadyExists = results.some(
-			(r) => moment(r.time).format('HH:mm') === rounded.format('HH:mm')
-		);
-		if (alreadyExists) return;
-
-		const randomNum = Math.floor(Math.random() * 99) + 1;
-		const formattedNumber = randomNum.toString().padStart(2, '0');
-
-		axios
-			.post(
-				`${HOST}/result`,
-				{
-					categoryname: 'Minidiswar',
-					time: rounded.toISOString(),
-					number: formattedNumber,
-					next_result: next.toISOString(),
-					result: [{ time: rounded.toISOString(), number: formattedNumber }],
-					date: moment().format('YYYY-MM-DD'),
-					key: 'md-9281',
-				},
-				{
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${data.authCode}`,
-					},
-				}
-			)
-			.then(() => apiforResults())
-			.catch(console.error);
-	};
-
-	const handleDelete = (id) => {
-		setModalShow(true);
-		setCatName(id);
-	};
-
 	useEffect(() => {
 		apiforResults();
 	}, []);
 
+	// Delete one time entry
+	const handleDeleteTime = (id, date, time) => {
+		if (!window.confirm(`Delete entry at ${time} on ${date}?`)) return;
+
+		axios
+			.patch(
+				`${HOST}/delete-existing-result/${id}`,
+				{ date, time },
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+					},
+				}
+			)
+			.then(() => apiforResults()) // reload list
+			.catch((err) => console.error(err));
+	};
+
+	console.log(results);
 	return (
 		<div className='container py-4'>
 			{/* Logout button */}
@@ -202,7 +231,9 @@ const page = () => {
 					<Row className='mb-4'>
 						<Col md={12}>
 							<Card>
-								<Card.Header>Create New Result</Card.Header>
+								<Card.Header>
+									{selectedResult ? 'Edit Result' : 'Create New Result'}
+								</Card.Header>
 								<Card.Body>
 									<Form onSubmit={handleAddResult}>
 										<Row className='g-3 container'>
@@ -270,7 +301,11 @@ const page = () => {
 													placeholder='Enter number'
 												/>
 												{form.number.length > 0 && form.number.length !== 2 && (
-													<div style={{ color: 'red', fontSize: '0.9rem' }}>
+													<div
+														style={{
+															color: 'red',
+															fontSize: '0.9rem',
+														}}>
 														Number must be exactly 2 digits.
 													</div>
 												)}
@@ -291,20 +326,22 @@ const page = () => {
 											<Button
 												type='submit'
 												variant='primary'>
-												Submit Result
+												{selectedResult ? 'Update Result' : 'Submit Result'}
 											</Button>
+											{selectedResult && (
+												<Button
+													className='ms-2'
+													variant='secondary'
+													onClick={resetForm}>
+													Cancel
+												</Button>
+											)}
 										</div>
 									</Form>
 								</Card.Body>
 							</Card>
 						</Col>
 					</Row>
-
-					<MyVerticallyCenteredModal
-						show={modalShow}
-						onHide={() => setModalShow(false)}
-						catname={catName}
-					/>
 
 					<Row>
 						<Col md={12}>
@@ -322,8 +359,9 @@ const page = () => {
 												<th>Category</th>
 												<th>Date</th>
 												<th>Number</th>
-												<th>Result (Time - Number)</th>
+												<th>Result Entries</th>
 												<th>Next Result</th>
+												<th>Actions</th>
 											</tr>
 										</thead>
 										<tbody>
@@ -333,14 +371,62 @@ const page = () => {
 													<td>{res.categoryname}</td>
 													<td>{res.date}</td>
 													<td>{res.number}</td>
+
+													{/* Show each result entry with independent buttons */}
 													<td>
-														{res.result.map((r, i) => (
-															<div key={i}>
-																{moment(r.time).format('HH:mm')} - {r.number}
+														{res.result.map((r, dateIdx) => (
+															<div
+																key={dateIdx}
+																className='mb-2'>
+																<strong>{r.date}</strong>
+																{r.times?.map((t, timeIdx) => (
+																	<div
+																		key={timeIdx}
+																		className='d-flex justify-content-between align-items-center border p-1 rounded mt-1'>
+																		<span>
+																			{t.time} - {t.number}
+																		</span>
+																		<div>
+																			<Button
+																				size='sm'
+																				variant='warning'
+																				className='me-2'
+																				onClick={() => handleEdit(res._id)}>
+																				Edit
+																			</Button>
+																			<Button
+																				size='sm'
+																				variant='danger'
+																				onClick={() =>
+																					handleDeleteTime(
+																						res._id,
+																						r.date,
+																						t.time
+																					)
+																				}>
+																				Delete
+																			</Button>
+																		</div>
+																	</div>
+																))}
 															</div>
 														))}
 													</td>
+
 													<td>{moment(res.next_result).format('HH:mm')}</td>
+
+													{/* Whole row actions */}
+													{res.categoryname === 'Minidiswar' && (
+														<td>
+															<Button
+																size='sm'
+																variant='secondary'
+																className='me-2'
+																onClick={() => handleEdit(res)}>
+																Edit Row
+															</Button>
+														</td>
+													)}
 												</tr>
 											))}
 										</tbody>

@@ -74,7 +74,6 @@ const PasswordResetForm = () => {
 		}
 	};
 
-	console.log(oldPassword);
 	return (
 		<Container
 			className='d-flex justify-content-center align-items-center'
