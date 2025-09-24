@@ -5,14 +5,17 @@ import { Button, Form, Row, Col, Card, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { HOST } from '@/static';
 import moment from 'moment';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 const EditResultPage = () => {
 	const router = useRouter();
-	const { id } = useParams();
+	const searchParams = useSearchParams();
+	const id = searchParams.get('id');
+	const date = searchParams.get('date');
+	const time = searchParams.get('time');
+	const [timess, setTimess] = useState([]);
 	const [loading, setLoading] = useState(true);
 	const [saving, setSaving] = useState(false);
-
 	const [form, setForm] = useState({
 		categoryname: '',
 		date: moment().format('YYYY-MM-DD'),
@@ -26,7 +29,6 @@ const EditResultPage = () => {
 	// Separate selections
 	const [selectedDateIdx, setSelectedDateIdx] = useState(null);
 	const [selectedTimeIdx, setSelectedTimeIdx] = useState(null);
-
 	useEffect(() => {
 		if (id) {
 			axios
@@ -37,23 +39,44 @@ const EditResultPage = () => {
 				})
 				.then((res) => {
 					const data = res.data.response;
-					setForm({
-						categoryname: data.categoryname,
-						date: data.date,
-						number: data.number,
-						result: data.result || [],
-						next_result: data.next_result,
-						key: data.key,
-						time: data.time,
-					});
-					setLoading(false);
+
+					if (data) {
+						// Find the date entry that matches the URL param
+						const dateEntry = data.result.find((r) => r.date === date);
+
+						// Get times array for the selected date
+						const timesArray = dateEntry ? dateEntry.times : [];
+						setTimess(timesArray);
+
+						// Find the time entry that matches the URL param
+						const timeEntry = timesArray.find((t) => t.time === time);
+
+						setForm({
+							categoryname: data.categoryname,
+							date: date || data.date,
+							number: timeEntry ? timeEntry.number : '',
+							result: data.result || [],
+							next_result: data.next_result,
+							key: data.key,
+							time: timeEntry ? timeEntry.time : '',
+						});
+
+						// Set selected indices for dropdowns
+						const dateIdx = data.result.findIndex((r) => r.date === date);
+						setSelectedDateIdx(dateIdx !== -1 ? dateIdx : null);
+
+						const timeIdx = timesArray.findIndex((t) => t.time === time);
+						setSelectedTimeIdx(timeIdx !== -1 ? timeIdx : null);
+
+						setLoading(false);
+					}
 				})
 				.catch((err) => {
 					console.error(err);
 					setLoading(false);
 				});
 		}
-	}, [id]);
+	}, [id, date, time]);
 
 	// Handle selecting date
 	const handleSelectDate = (e) => {
@@ -182,13 +205,9 @@ const EditResultPage = () => {
 								<Form.Select
 									onChange={handleSelectDate}
 									value={selectedDateIdx ?? ''}>
-									<option
-										value=''
-										disabled>
-										-- Choose Date --
-									</option>
 									{form.result.map((r, idx) => (
 										<option
+											selected
 											key={idx}
 											value={idx}>
 											{r.date}
@@ -202,21 +221,19 @@ const EditResultPage = () => {
 								md={6}
 								className='mt-3'>
 								<Form.Label>Select Time Entry</Form.Label>
-								<Form.Select
-									onChange={handleSelectTime}
-									value={selectedTimeIdx ?? ''}
-									disabled={selectedDateIdx === null}>
+								<Form.Select onChange={handleSelectTime}>
 									<option
 										value=''
 										disabled>
 										-- Choose Time --
 									</option>
-									{selectedDateIdx !== null &&
-										form.result[selectedDateIdx].times.map((t, idx) => (
+									{timess
+										.filter((itemss) => itemss.time === time)
+										.map((itt, indx) => (
 											<option
-												key={idx}
-												value={idx}>
-												{t.time} ({t.number})
+												selected
+												value=''>
+												{itt.time}
 											</option>
 										))}
 								</Form.Select>

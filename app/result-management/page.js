@@ -147,7 +147,7 @@ const page = () => {
 		});
 	};
 
-	const handleEdit = (res) => {
+	const handleEdit = (res, date, time) => {
 		setSelectedResult(res);
 		setForm({
 			categoryname: res.categoryname,
@@ -159,20 +159,7 @@ const page = () => {
 			time: res.time,
 		});
 		window.scrollTo({ top: 0, behavior: 'smooth' });
-		router.push(`/edit/${res._id}`);
-	};
-
-	const handleDelete = (id) => {
-		if (confirm('Are you sure you want to delete this result?')) {
-			axios
-				.delete(`${HOST}/result/${id}`, {
-					headers: {
-						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-					},
-				})
-				.then(() => apiforResults())
-				.catch(console.error);
-		}
+		router.push(`/edit?id=${res._id}&date=${date}&time=${time}`);
 	};
 
 	const apiforResults = () => {
@@ -209,7 +196,6 @@ const page = () => {
 			.catch((err) => console.error(err));
 	};
 
-	console.log(results);
 	return (
 		<div className='container py-4'>
 			{/* Logout button */}
@@ -391,7 +377,9 @@ const page = () => {
 																				size='sm'
 																				variant='warning'
 																				className='me-2'
-																				onClick={() => handleEdit(res)}>
+																				onClick={() =>
+																					handleEdit(res, r.date, t.time)
+																				}>
 																				Edit
 																			</Button>
 																			<Button
