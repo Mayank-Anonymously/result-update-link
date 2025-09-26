@@ -3,9 +3,10 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Button, Form, Row, Col, Card, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { HOST } from '@/static';
+import { HOST } from '../../static';
 import moment from 'moment';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 const EditResultPage = () => {
 	const router = useRouter();
@@ -141,9 +142,26 @@ const EditResultPage = () => {
 					},
 				}
 			)
-			.then(() => {
+			.then((res) => {
 				setSaving(false);
-				router.push('/result-management');
+				if (res.data.message === 'Result updated successfully') {
+					Swal.fire({
+						icon: 'success',
+						title: 'Success!',
+						text: res.data.message,
+						timer: 2000,
+						showConfirmButton: false,
+					});
+					router.push('/result-management');
+				} else {
+					Swal.fire({
+						icon: 'error',
+						title: 'Error!',
+						text: res.data.message,
+						timer: 2000,
+						showConfirmButton: false,
+					});
+				}
 			})
 			.catch((err) => {
 				console.error(err);

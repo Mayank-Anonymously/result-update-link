@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Form, Button, Card, Container, Alert, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { HOST } from '@/static';
+import { HOST } from '../../static';
 
 const LoginForm = () => {
 	const [email, setEmail] = useState('');

@@ -1,6 +1,4 @@
-'use client';
-
-import LoginForm from '@/Components/Authentication/Login';
+import LoginForm from '../Components/Authentication/Login';
 
 const Home = () => {
 	return (

@@ -3,13 +3,12 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Table, Button, Form, Row, Col, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { MyVerticallyCenteredModal } from '@/EditEntries';
 import Tab from 'react-bootstrap/Tab';
 import Tabs from 'react-bootstrap/Tabs';
-import AddCategoryforkey from '@/AddKeyForCategory';
 import moment from 'moment';
-import { HOST } from '@/static';
+import { HOST } from '../../static';
 import { useRouter } from 'next/navigation';
+import Swal from 'sweetalert2';
 
 const getRoundedISOTime = () => {
 	const now = moment();
@@ -32,7 +31,7 @@ const page = () => {
 	const [form, setForm] = useState({
 		categoryname: 'Minidiswar',
 		date: moment().format('YYYY-MM-DD'),
-		number: '',
+		number: '00',
 		result: [{ time: '', number: '' }],
 		next_result: nextResultISO,
 		key: 'md-9281',
@@ -74,61 +73,57 @@ const page = () => {
 
 	const handleAddResult = (e) => {
 		e.preventDefault();
-		if (selectedResult) {
-			// Update existing result
-			axios
-				.put(
-					`${HOST}/result/${selectedResult._id}`,
-					{
-						categoryname: form.categoryname,
-						time: form.time,
-						number: form.number,
-						next_result: form.next_result,
-						result: [{ time: form.time, number: form.number }],
-						date: form.date,
-						key: form.key,
-					},
-					{
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+
+		// Add new result
+		axios
+			.post(
+				`${HOST}/result`,
+				{
+					categoryname: form.categoryname,
+					time: moment(form.time).format('hh:mm A'),
+					number: form.number,
+					next_result: moment(form.next_result).format('hh:mm A'),
+					result: [
+						{
+							time: moment(form.time).format('hh:mm A'),
+							number: form.number,
 						},
-					}
-				)
-				.then(() => {
-					apiforResults();
-					setSelectedResult(null); // reset
-					resetForm();
-				})
-				.catch(console.error);
-		} else {
-			// Add new result
-			axios
-				.post(
-					`${HOST}/result`,
-					{
-						categoryname: form.categoryname,
-						time: form.time,
-						number: form.number,
-						next_result: form.next_result,
-						result: [{ time: form.time, number: form.number }],
-						date: form.date,
-						key: form.key,
+					],
+					date: form.date,
+					key: form.key,
+				},
+				{
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 					},
-					{
-						headers: {
-							'Content-Type': 'application/json',
-							Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-						},
-					}
-				)
-				.then(() => {
+				}
+			)
+			.then((res) => {
+				if (res.data.message === 'Result saved successfully') {
+					Swal.fire({
+						icon: 'success',
+						title: 'Success!',
+						text: res.data.message,
+						timer: 2000,
+						showConfirmButton: false,
+					});
 					apiforResults();
 					setLastManualSubmit(moment());
 					resetForm();
-				})
-				.catch(console.error);
-		}
+				} else if (res.data.message === 'Duplicate time(s) detected') {
+					Swal.fire({
+						icon: 'error',
+						title: 'Error!',
+						text: res.data.message,
+						timer: 2000,
+						showConfirmButton: false,
+					});
+					apiforResults();
+					setLastManualSubmit(moment());
+				}
+			})
+			.catch(console.error);
 	};
 
 	const resetForm = () => {
@@ -170,7 +165,9 @@ const page = () => {
 					Authorization: `Bearer ${localStorage.getItem('authToken')}`,
 				},
 			})
-			.then((res) => setResults(res.data.data))
+			.then((res) => {
+				setResults(res.data.data);
+			})
 			.catch(console.error);
 	};
 
@@ -179,7 +176,8 @@ const page = () => {
 	}, []);
 
 	// Delete one time entry
-	const handleDeleteTime = (id, date, time) => {
+	const handleDeleteTime = (id, time, date) => {
+		console.log(date, time);
 		if (!window.confirm(`Delete entry at ${time} on ${date}?`)) return;
 
 		axios
@@ -286,15 +284,16 @@ const page = () => {
 													required
 													placeholder='Enter number'
 												/>
-												{form.number.length > 0 && form.number.length !== 2 && (
-													<div
-														style={{
-															color: 'red',
-															fontSize: '0.9rem',
-														}}>
-														Number must be exactly 2 digits.
-													</div>
-												)}
+												{form.number?.length > 0 &&
+													form.number?.length !== 2 && (
+														<div
+															style={{
+																color: 'red',
+																fontSize: '0.9rem',
+															}}>
+															Number must be exactly 2 digits.
+														</div>
+													)}
 											</Col>
 											<Col
 												md={4}
@@ -357,48 +356,51 @@ const page = () => {
 													<td>{res.categoryname}</td>
 													<td>{res.date}</td>
 													<td>{res.number}</td>
-
 													{/* Show each result entry with independent buttons */}
 													<td>
-														{res.result.map((r, dateIdx) => (
-															<div
-																key={dateIdx}
-																className='mb-2'>
-																<strong>{r.date}</strong>
-																{r.times?.map((t, timeIdx) => (
-																	<div
-																		key={timeIdx}
-																		className='d-flex justify-content-between align-items-center border p-1 rounded mt-1'>
-																		<span>
-																			{t.time} - {t.number}
-																		</span>
-																		<div>
-																			<Button
-																				size='sm'
-																				variant='warning'
-																				className='me-2'
-																				onClick={() =>
-																					handleEdit(res, r.date, t.time)
-																				}>
-																				Edit
-																			</Button>
-																			<Button
-																				size='sm'
-																				variant='danger'
-																				onClick={() =>
-																					handleDeleteTime(
-																						res._id,
-																						r.date,
-																						t.time
-																					)
-																				}>
-																				Delete
-																			</Button>
-																		</div>
-																	</div>
-																))}
-															</div>
-														))}
+														{res.result.map((r, dateIdx) => {
+															return (
+																<div
+																	key={dateIdx}
+																	className='mb-2'>
+																	<strong>{r.date}</strong>
+																	{r.times?.map((t, timeIdx) => {
+																		return (
+																			<div
+																				key={timeIdx}
+																				className='d-flex justify-content-between align-items-center border p-1 rounded mt-1'>
+																				<span>
+																					{t.time} - {t.number}
+																				</span>
+																				<div>
+																					<Button
+																						size='sm'
+																						variant='warning'
+																						className='me-2'
+																						onClick={() =>
+																							handleEdit(res, r.date, t.time)
+																						}>
+																						Edit
+																					</Button>
+																					<Button
+																						size='sm'
+																						variant='danger'
+																						onClick={() =>
+																							handleDeleteTime(
+																								res._id,
+																								t.time,
+																								r.date
+																							)
+																						}>
+																						Delete
+																					</Button>
+																				</div>
+																			</div>
+																		);
+																	})}
+																</div>
+															);
+														})}
 													</td>
 
 													<td>{moment(res.next_result).format('HH:mm')}</td>
