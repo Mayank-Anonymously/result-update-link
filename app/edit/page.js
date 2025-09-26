@@ -1,6 +1,6 @@
 'use client';
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Button, Form, Row, Col, Card, Spinner } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { HOST } from '../../static';
@@ -178,128 +178,130 @@ const EditResultPage = () => {
 	}
 
 	return (
-		<div className='container py-4'>
-			<Card>
-				<Card.Header>Edit Result</Card.Header>
-				<Card.Body>
-					<Form onSubmit={handleUpdate}>
-						<Row className='g-3 container'>
-							<Col md={4}>
-								<Form.Label>Category</Form.Label>
-								<Form.Control
-									type='text'
-									name='categoryname'
-									value={form.categoryname}
-									onChange={handleChange}
-									required
-								/>
-							</Col>
-							<Col md={4}>
-								<Form.Label>Key</Form.Label>
-								<Form.Control
-									type='text'
-									name='key'
-									value={form.key}
-									onChange={handleChange}
-									required
-								/>
-							</Col>
-							<Col md={4}>
-								<Form.Label>Main Date</Form.Label>
-								<Form.Control
-									type='date'
-									name='date'
-									value={form.date}
-									onChange={handleChange}
-									required
-								/>
-							</Col>
+		<Suspense fallback={<div>loading...</div>}>
+			<div className='container py-4'>
+				<Card>
+					<Card.Header>Edit Result</Card.Header>
+					<Card.Body>
+						<Form onSubmit={handleUpdate}>
+							<Row className='g-3 container'>
+								<Col md={4}>
+									<Form.Label>Category</Form.Label>
+									<Form.Control
+										type='text'
+										name='categoryname'
+										value={form.categoryname}
+										onChange={handleChange}
+										required
+									/>
+								</Col>
+								<Col md={4}>
+									<Form.Label>Key</Form.Label>
+									<Form.Control
+										type='text'
+										name='key'
+										value={form.key}
+										onChange={handleChange}
+										required
+									/>
+								</Col>
+								<Col md={4}>
+									<Form.Label>Main Date</Form.Label>
+									<Form.Control
+										type='date'
+										name='date'
+										value={form.date}
+										onChange={handleChange}
+										required
+									/>
+								</Col>
 
-							{/* Select Date Entry */}
-							<Col
-								md={6}
-								className='mt-3'>
-								<Form.Label>Select Date Entry</Form.Label>
-								<Form.Select
-									onChange={handleSelectDate}
-									value={selectedDateIdx ?? ''}>
-									{form.result.map((r, idx) => (
-										<option
-											selected
-											key={idx}
-											value={idx}>
-											{r.date}
-										</option>
-									))}
-								</Form.Select>
-							</Col>
-
-							{/* Select Time Entry */}
-							<Col
-								md={6}
-								className='mt-3'>
-								<Form.Label>Select Time Entry</Form.Label>
-								<Form.Select onChange={handleSelectTime}>
-									<option
-										value=''
-										disabled>
-										-- Choose Time --
-									</option>
-									{timess
-										.filter((itemss) => itemss.time === time)
-										.map((itt, indx) => (
+								{/* Select Date Entry */}
+								<Col
+									md={6}
+									className='mt-3'>
+									<Form.Label>Select Date Entry</Form.Label>
+									<Form.Select
+										onChange={handleSelectDate}
+										value={selectedDateIdx ?? ''}>
+										{form.result.map((r, idx) => (
 											<option
 												selected
-												value=''>
-												{itt.time}
+												key={idx}
+												value={idx}>
+												{r.date}
 											</option>
 										))}
-								</Form.Select>
-							</Col>
+									</Form.Select>
+								</Col>
 
-							{/* Number */}
-							<Col
-								md={6}
-								className='mt-3'>
-								<Form.Label>Number</Form.Label>
-								<Form.Control
-									type='text'
-									name='number'
-									value={form.number}
-									onChange={(e) => {
-										const val = e.target.value.replace(/\D/g, '');
-										if (val.length <= 2) {
-											setForm((prev) => ({
-												...prev,
-												number: val,
-											}));
-										}
-									}}
-									maxLength={2}
-									disabled={selectedTimeIdx === null}
-									required
-								/>
-							</Col>
-						</Row>
+								{/* Select Time Entry */}
+								<Col
+									md={6}
+									className='mt-3'>
+									<Form.Label>Select Time Entry</Form.Label>
+									<Form.Select onChange={handleSelectTime}>
+										<option
+											value=''
+											disabled>
+											-- Choose Time --
+										</option>
+										{timess
+											.filter((itemss) => itemss.time === time)
+											.map((itt, indx) => (
+												<option
+													selected
+													value=''>
+													{itt.time}
+												</option>
+											))}
+									</Form.Select>
+								</Col>
 
-						<div className='mt-3 text-end'>
-							<Button
-								type='submit'
-								variant='primary'
-								disabled={saving}>
-								{saving ? 'Updating...' : 'Update Result'}
-							</Button>
-							<Button
-								className='ms-2'
-								variant='secondary'
-								onClick={() => router.push('/')}>
-								Cancel
-							</Button>
-						</div>
-					</Form>
-				</Card.Body>
-			</Card>
-		</div>
+								{/* Number */}
+								<Col
+									md={6}
+									className='mt-3'>
+									<Form.Label>Number</Form.Label>
+									<Form.Control
+										type='text'
+										name='number'
+										value={form.number}
+										onChange={(e) => {
+											const val = e.target.value.replace(/\D/g, '');
+											if (val.length <= 2) {
+												setForm((prev) => ({
+													...prev,
+													number: val,
+												}));
+											}
+										}}
+										maxLength={2}
+										disabled={selectedTimeIdx === null}
+										required
+									/>
+								</Col>
+							</Row>
+
+							<div className='mt-3 text-end'>
+								<Button
+									type='submit'
+									variant='primary'
+									disabled={saving}>
+									{saving ? 'Updating...' : 'Update Result'}
+								</Button>
+								<Button
+									className='ms-2'
+									variant='secondary'
+									onClick={() => router.push('/')}>
+									Cancel
+								</Button>
+							</div>
+						</Form>
+					</Card.Body>
+				</Card>
+			</div>
+		</Suspense>
 	);
 };
 
