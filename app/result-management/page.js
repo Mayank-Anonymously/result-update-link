@@ -24,10 +24,7 @@ const page = () => {
 	const nextResultISO = moment(roundedTimeISO).add(15, 'minutes').toISOString();
 	const router = useRouter();
 	const [results, setResults] = useState([]);
-	const [modalShow, setModalShow] = useState(false);
-	const [catName, setCatName] = useState('');
 	const [selectedResult, setSelectedResult] = useState(null); // for edit
-	const [loading, setLoading] = useState(false);
 	const [form, setForm] = useState({
 		categoryname: 'Minidiswar',
 		date: moment().format('YYYY-MM-DD'),
